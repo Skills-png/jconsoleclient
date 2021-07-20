@@ -13,5 +13,5 @@ try:
 except:
     print('[-] Ip '+SERVER_IP+' Port '+str(PORT_NUMBER))
 while True:
-    mySocket.sendto(input(' $ ').encode('utf8'),(str(SERVER_IP),int(PORT_NUMBER)))
+    mySocket.sendto(input(f'{os.getlogin()} $ ').encode('utf8'),(str(SERVER_IP),int(PORT_NUMBER)))
 sys.exit()
