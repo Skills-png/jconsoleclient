@@ -1,4 +1,4 @@
-import apiai, json, re, os, sys
+import  json, re, os, sys
 import pyttsx3
 import speech_recognition as sr
 import sys, os
@@ -51,7 +51,7 @@ def record_volume():
             os.system('shutdown -s -t 0')
         if query.lower() == "о'кей а там заблокируй компьютер":
             os.system('Rundll32.exe user32.dll,LockWorkStation')
-        textMessage( text )
+        
     except:
         pass
 
@@ -59,19 +59,7 @@ def talk( text ):
     tts.say( text )
     tts.runAndWait()
 
-def textMessage( text ):
-    request = apiai.ApiAI('ваш токен').text_request() # Токен API к Dialogflow
-    request.lang = 'ru' # На каком языке будет послан запрос
-    request.session_id = 'ваш id' # ID Сессии диалога (нужно, чтобы потом учить бота)
-    request.query = text # Посылаем запрос к ИИ с сообщением от юзера
-    responseJson = json.loads(request.getresponse().read().decode('utf-8'))
-    response = responseJson['result']['fulfillment']['speech'] # Разбираем JSON и вытаскиваем ответ
-    # Если есть ответ от бота - присылаем пользователю, если нет - бот его не понял
-    if response:
-        request.audio_output = response
-        talk(response)
-    else:
-        talk('Простите. Я Вас не совсем поняла.')
+ 
 
 while True:
     record_volume()
