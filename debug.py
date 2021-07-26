@@ -1,48 +1,65 @@
-import speech_recognition as sr
+import  json, re, os, sys
 import pyttsx3
-import pywhatkit
-import datetime
-import wikipedia
-import pyjokes
-listener = sr.Recognizer()
-engine = pyttsx3.init()
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
-def talk(text):
-    engine.say(text)
-    engine.runAndWait()
-def take_command():
+import speech_recognition as sr
+import sys, os
+from socket import socket, AF_INET, SOCK_DGRAM
+tts = pyttsx3.init()
+rate = tts.getProperty('rate')
+tts.setProperty('rate', rate-40)
+volume = tts.getProperty('volume')
+tts.setProperty('volume', volume+0.9)
+voices = tts.getProperty('voices')
+tts.setProperty('voice', 'ru')
+for voice in voices:
+    if voice.name == '1':
+        tts.setProperty('voice', voice.id)
+def stop(var):
+
+    SERVER_IP   = sys.argv[1] #    172.16.51.14
+    PORT_NUMBER = sys.argv[2] #    5000
+    SIZE = 1024
+    print('[*] Metros Jconsole - Remote computer access.')
+    print('[*] Jconsole version 1.0.\n')
+    print('[*] Github client: https://github.com/Skills-png/jconsoleclient')
+    print('[*] Github server: https://github.com/Skills-png/jconsoleserver\n')
     try:
-        with sr.Microphone() as source:
-            print('listening...')
-            voice = listener.listen(source)
-            command = listener.recognize_google(voice)
-            print(command)
+        mySocket = socket(AF_INET, SOCK_DGRAM)
+        print('[+] Ip '+SERVER_IP+' Port '+PORT_NUMBER)
+    except:
+        print('[-] Ip '+SERVER_IP+' Port '+str(PORT_NUMBER))
+    while True:
+        mySocket.sendto(var.encode('utf8'),(str(SERVER_IP),int(PORT_NUMBER)))
+    sys.exit()
+def record_volume():
+    r = sr.Recognizer()
+    with sr.Microphone(device_index = 1) as source:
+        
+        r.adjust_for_ambient_noise(source, duration=1) 
+         
+        audio = r.listen(source)
+     
+    try:
+        query = r.recognize_google(audio, language = 'ru-RU')
+        text = query.lower()
+        print(query.lower())
+        
+        if query.lower() == "о'кей а там включи spotify":
+            stop('start C:\\Users\\Atom\AppData\\Roaming\\Spotify\\spotify.exe')
+        if query.lower() == "о'кей а там выключи spotify":
+            stop('taskkill /im spotify.exe /f>nul')
+        if query.lower() == "о'кей а там выключи компьютер":
+            stop('shutdown -s -t 0')
+        if query.lower() == "о'кей а там заблокируй компьютер":
+            stop('Rundll32.exe user32.dll,LockWorkStation')
+        
     except:
         pass
-    return command
-def run_alexa():
-    command = take_command()
-    print(command)
-    if 'play' in command:
-        song = command.replace('play', '')
-        talk('playing ' + song)
-        pywhatkit.playonyt(song)
-    elif 'time' in command:
-        time = datetime.datetime.now().strftime('%I:%M %p')
-        talk('Current time is ' + time)
-    elif 'who the heck is' in command:
-        person = command.replace('who the heck is', '')
-        info = wikipedia.summary(person, 1)
-        print(info)
-        talk(info)
-    elif 'date' in command:
-        talk('sorry, I have a headache')
-    elif 'are you single' in command:
-        talk('I am in a relationship with wifi')
-    elif 'joke' in command:
-        talk(pyjokes.get_joke())
-    else:
-        talk('please say the command again')
+
+def talk( text ):
+    tts.say( text )
+    tts.runAndWait()
+
+ 
+
 while True:
-    run_alexa()
+    record_volume()
